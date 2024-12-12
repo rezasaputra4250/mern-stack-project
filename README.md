@@ -101,5 +101,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - The MERN stack allows you to create full-stack JavaScript applications.
 - Thanks to all the contributors and open-source libraries used in this project.
-
-```
