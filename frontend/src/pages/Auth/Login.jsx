@@ -1,14 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [users, setUsers] = useState([]); // Menyimpan data users dari API
+
+    // Mengambil data users dari API saat komponen dimuat
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const response = await axios.get('http://localhost:5000/api/users');
+                setUsers(response.data); // Menyimpan data users ke state
+            } catch (error) {
+                console.error('Error fetching users:', error);
+            }
+        };
+
+        fetchUsers();
+    }, []); // Kosongkan array dependencies untuk hanya memanggil sekali saat komponen dimuat
 
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log('Login', { email, password });
-        // Tambahkan logic API di sini
+
+        // Tambahkan logic untuk memeriksa apakah email dan password cocok dengan data pengguna
+        const user = users.find((user) => user.email === email && user.password === password);
+        if (user) {
+            console.log('Login successful', user);
+            // Arahkan ke halaman lain atau simpan informasi user
+        } else {
+            console.log('Invalid email or password');
+        }
     };
 
     return (
