@@ -3,7 +3,7 @@ require('dotenv').config(); // Memuat variabel lingkungan dari .env
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const userRoutes = require('./routes/userRoutes');
+const userRoutes = require('./routes/userRoutes'); // Pastikan mengarah ke userRoutes
 
 const app = express();
 
@@ -25,7 +25,7 @@ mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology
   });
 
 // Routes
-app.use('/api/users', userRoutes);
+app.use('/api/users', userRoutes); // Menambahkan /api sebelum routes
 
 // Server listen
 const port = process.env.PORT || 5000;

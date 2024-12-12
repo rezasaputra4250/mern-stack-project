@@ -8,10 +8,10 @@ const generateFakeUser = () => {
   return {
     firstName: faker.person.firstName(),
     lastName: faker.person.lastName(),
-    email: faker.internet.email(),
-    password: faker.internet.password(),
     dateOfBirth: faker.date.past(30), // Umur antara 0-30 tahun
     gender: faker.helpers.arrayElement(['male', 'female', 'other']),
+    email: faker.internet.email(),
+    password: faker.internet.password(),
   };
 };
 
