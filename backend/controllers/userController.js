@@ -1,8 +1,9 @@
 const User = require('../models/User');
+const bcrypt = require('bcryptjs');
 
 // Fungsi untuk membuat user baru
 const createUser = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { firstName, lastName, dateOfBirth, gender, email, password } = req.body;
 
   try {
     // Cek apakah user sudah ada
@@ -11,10 +12,16 @@ const createUser = async (req, res) => {
       return res.status(400).json({ msg: 'User already exists' });
     }
 
+    // Enkripsi password sebelum menyimpannya
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const newUser = new User({
-      name,
+      firstName,
+      lastName,
+      dateOfBirth,
+      gender,
       email,
-      password,  // Pertimbangkan untuk mengenkripsi password sebelum menyimpannya
+      password: hashedPassword,  // Menyimpan password yang sudah dienkripsi
     });
 
     await newUser.save();
@@ -55,13 +62,25 @@ const getUserById = async (req, res) => {
 // Fungsi untuk memperbarui user berdasarkan ID
 const updateUser = async (req, res) => {
   const { id } = req.params;
-  const { name, email, password } = req.body;
+  const { firstName, lastName, dateOfBirth, gender, email, password } = req.body;
 
   try {
-    const updatedUser = await User.findByIdAndUpdate(id, { name, email, password }, { new: true });
+    // Enkripsi password jika ada perubahan password
+    const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
+
+    const updatedUser = await User.findByIdAndUpdate(id, {
+      firstName,
+      lastName,
+      dateOfBirth,
+      gender,
+      email,
+      password: hashedPassword || undefined,
+    }, { new: true });
+
     if (!updatedUser) {
       return res.status(404).json({ msg: 'User not found' });
     }
+
     res.json({ msg: 'User updated successfully', user: updatedUser });
   } catch (error) {
     console.error(error);
