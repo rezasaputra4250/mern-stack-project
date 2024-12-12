@@ -1,19 +1,28 @@
-const { faker } = require('@faker-js/faker');
-const mongoose = require('mongoose'); // Tambahkan impor mongoose
-const User = require('../models/User'); // Import model User
+require('dotenv').config(); // Memuat variabel lingkungan dari .env
+const mongoose = require('mongoose'); // Impor mongoose
+const { faker } = require('@faker-js/faker'); // Impor faker
+const User = require('../models/User'); // Impor model User
 
 // Fungsi untuk membuat data palsu
 const generateFakeUser = () => {
   return {
-    name: faker.person.fullName(), // Ganti dengan faker.person.fullName
+    firstName: faker.person.firstName(),
+    lastName: faker.person.lastName(),
     email: faker.internet.email(),
     password: faker.internet.password(),
+    dateOfBirth: faker.date.past(30), // Umur antara 0-30 tahun
+    gender: faker.helpers.arrayElement(['male', 'female', 'other']),
   };
 };
 
 // Fungsi untuk melakukan seeding data
 const seedUsers = async () => {
   try {
+    // Koneksi ke MongoDB menggunakan variabel dari .env
+    await mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+
+    console.log('Connected to MongoDB');
+
     // Hapus data lama sebelum menambahkan data baru (opsional)
     await User.deleteMany({});
 
@@ -30,5 +39,7 @@ const seedUsers = async () => {
     mongoose.disconnect();
   }
 };
+
+seedUsers(); // Jalankan fungsi seedUsers
 
 module.exports = seedUsers;
