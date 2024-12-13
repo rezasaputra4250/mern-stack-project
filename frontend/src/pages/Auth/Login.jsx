@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';  // Tambahkan useNavigate
 import axios from 'axios';
+import bcrypt from 'bcryptjs';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [users, setUsers] = useState([]); // Menyimpan data users dari API
+    const [error, setError] = useState(''); // Untuk menyimpan pesan error
+    const navigate = useNavigate();  // Inisialisasi useNavigate
 
     // Mengambil data users dari API saat komponen dimuat
     useEffect(() => {
@@ -25,13 +28,24 @@ const Login = () => {
         e.preventDefault();
         console.log('Login', { email, password });
 
-        // Tambahkan logic untuk memeriksa apakah email dan password cocok dengan data pengguna
-        const user = users.find((user) => user.email === email && user.password === password);
+        // Mencari user berdasarkan email
+        const user = users.find((user) => user.email === email);
         if (user) {
-            console.log('Login successful', user);
-            // Arahkan ke halaman lain atau simpan informasi user
+            // Membandingkan password yang dimasukkan dengan password terenkripsi menggunakan bcrypt
+            bcrypt.compare(password, user.password, (err, isMatch) => {
+                if (err) {
+                    console.error('Error comparing passwords:', err);
+                    setError('An error occurred. Please try again.');
+                } else if (isMatch) {
+                    console.log('Login successful', user);
+                    // Setelah login berhasil, arahkan ke halaman utama
+                    navigate('/');  // Arahkan ke halaman '/'
+                } else {
+                    setError('Invalid email or password');
+                }
+            });
         } else {
-            console.log('Invalid email or password');
+            setError('Invalid email or password');
         }
     };
 
@@ -65,6 +79,11 @@ const Login = () => {
                         required
                     />
                 </div>
+
+                {/* Error Message */}
+                {error && (
+                    <div className="mb-4 text-red-500 text-sm text-center">{error}</div>
+                )}
 
                 <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded mb-4">
                     Login
