@@ -1,45 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';  // Tambahkan useNavigate
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import bcrypt from 'bcryptjs';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [users, setUsers] = useState([]); // Menyimpan data users dari API
-    const [error, setError] = useState(''); // Untuk menyimpan pesan error
-    const navigate = useNavigate();  // Inisialisasi useNavigate
+    const [users, setUsers] = useState([]);
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
+    const location = useLocation();
+    const successMessage = location.state?.message;
 
-    // Mengambil data users dari API saat komponen dimuat
     useEffect(() => {
         const fetchUsers = async () => {
             try {
                 const response = await axios.get('http://localhost:5000/api/users');
-                setUsers(response.data); // Menyimpan data users ke state
+                setUsers(response.data);
             } catch (error) {
                 console.error('Error fetching users:', error);
             }
         };
 
         fetchUsers();
-    }, []); // Kosongkan array dependencies untuk hanya memanggil sekali saat komponen dimuat
+    }, []);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Login', { email, password });
 
-        // Mencari user berdasarkan email
         const user = users.find((user) => user.email === email);
         if (user) {
-            // Membandingkan password yang dimasukkan dengan password terenkripsi menggunakan bcrypt
             bcrypt.compare(password, user.password, (err, isMatch) => {
                 if (err) {
                     console.error('Error comparing passwords:', err);
                     setError('An error occurred. Please try again.');
                 } else if (isMatch) {
                     console.log('Login successful', user);
-                    // Setelah login berhasil, arahkan ke halaman utama
-                    navigate('/');  // Arahkan ke halaman '/'
+
+                    // Simpan data pengguna dalam localStorage
+                    localStorage.setItem('user', JSON.stringify(user));  // Menyimpan user dalam session
+
+                    // Arahkan ke halaman utama setelah login berhasil
+                    navigate('/');
                 } else {
                     setError('Invalid email or password');
                 }
@@ -54,7 +56,10 @@ const Login = () => {
             <form onSubmit={handleSubmit} className="w-full max-w-sm p-6 bg-white rounded shadow-md">
                 <h2 className="text-xl font-bold mb-6 text-center">Login</h2>
 
-                {/* Email */}
+                {successMessage && (
+                    <div className="mb-4 text-green-500 text-sm text-center">{successMessage}</div>
+                )}
+
                 <div className="mb-4">
                     <label className="block text-sm font-medium">Email</label>
                     <input
@@ -67,7 +72,6 @@ const Login = () => {
                     />
                 </div>
 
-                {/* Password */}
                 <div className="mb-4">
                     <label className="block text-sm font-medium">Password</label>
                     <input
@@ -80,7 +84,6 @@ const Login = () => {
                     />
                 </div>
 
-                {/* Error Message */}
                 {error && (
                     <div className="mb-4 text-red-500 text-sm text-center">{error}</div>
                 )}
