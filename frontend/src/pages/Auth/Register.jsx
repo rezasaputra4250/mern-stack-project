@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 import bcrypt from 'bcryptjs';
 
 const Register = () => {
@@ -11,6 +11,7 @@ const Register = () => {
     const [dateOfBirth, setDateOfBirth] = useState('');
     const [gender, setGender] = useState('');
 
+    const navigate = useNavigate(); // Inisialisasi navigate
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -51,7 +52,9 @@ const Register = () => {
 
             const data = await response.json();
             console.log('User registered successfully:', data);
-            // Redirect atau tampilkan pesan sukses
+            // Redirect ke halaman login dengan pesan sukses
+            navigate('/login', { state: { message: 'Registration successful! Please log in.' } });
+
         } catch (error) {
             console.error('Error registering user:', error);
             alert('Registration failed');

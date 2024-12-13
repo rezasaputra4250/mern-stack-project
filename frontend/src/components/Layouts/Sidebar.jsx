@@ -1,9 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const Sidebar = ({ role }) => {
+const Sidebar = () => {
+    const [role, setRole] = useState(null);
+
+    useEffect(() => {
+        // Mengambil data pengguna dari localStorage
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user) {
+            setRole(user.role); // Set role berdasarkan data pengguna
+        }
+    }, []);
+
+    if (!role) {
+        return (
+            <aside className="bg-gray-100 w-64 h-screen p-4 hidden md:block">
+                <nav>
+                    <ul>
+                        <li className="mb-4">
+                            <Link to="/login" className="text-blue-600 hover:underline">Login</Link>
+                        </li>
+                        <li className="mb-4">
+                            <Link to="/register" className="text-blue-600 hover:underline">Register</Link>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
+        );
+    }
+
     return (
-        <aside className="bg-gray-100 w-64 h-screen p-4">
+        <aside className="bg-gray-100 w-64 h-screen p-4 hidden md:block">
             <nav>
                 <ul>
                     <li className="mb-4">
@@ -61,13 +88,6 @@ const Sidebar = ({ role }) => {
                             </li>
                         </>
                     ) : null}
-                    {/* Menu Login dan Register */}
-                    <li>
-                        <Link to="/login" className="text-blue-600 hover:underline">Login</Link>
-                    </li>
-                    <li>
-                        <Link to="/register" className="text-blue-600 hover:underline">Register</Link>
-                    </li>
                 </ul>
             </nav>
         </aside>
