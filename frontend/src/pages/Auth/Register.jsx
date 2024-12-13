@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import bcrypt from 'bcryptjs';
 
 const Register = () => {
     const [firstName, setFirstName] = useState('');
@@ -10,6 +11,7 @@ const Register = () => {
     const [dateOfBirth, setDateOfBirth] = useState('');
     const [gender, setGender] = useState('');
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -18,9 +20,23 @@ const Register = () => {
             return;
         }
 
-        const userData = { firstName, lastName, email, password, dateOfBirth, gender };
-
         try {
+            // Enkripsi password menggunakan bcrypt
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+
+            // Data pengguna dengan password terenkripsi
+            const userData = {
+                firstName,
+                lastName,
+                email,
+                password: hashedPassword, // Gunakan password terenkripsi
+                dateOfBirth,
+                gender,
+                role: 'student', // Nilai default untuk role
+            };
+
+            // Kirim data ke backend
             const response = await fetch('http://localhost:5000/api/users', {
                 method: 'POST',
                 headers: {
@@ -35,7 +51,7 @@ const Register = () => {
 
             const data = await response.json();
             console.log('User registered successfully:', data);
-            // Redirect or show success message as needed
+            // Redirect atau tampilkan pesan sukses
         } catch (error) {
             console.error('Error registering user:', error);
             alert('Registration failed');
